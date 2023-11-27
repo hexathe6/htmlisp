@@ -4,19 +4,16 @@ write any language in lisp.
 
 because lisp is good.
 
-(currently implemented: html (basic support), current priority: html
-attributes, css)
+(currently implemented: html (tags and attributes), current priority: css)
 
 ## terminology
 
 for the rest of this document "$ll" will refer to the lispylangs root
 directory.
 
-## html
+<details><summary><h2>html</h2></summary>
 
-<details><summary>files</summary>
-
-<details><summary>`$ll/html/html.lisp`</summary>
+<details><summary><code>$ll/html/html.lisp</code></summary>
 
 ### `html`
 
@@ -34,8 +31,10 @@ converts lisp forms to html.
 
 ### `html-tag`
 
-creates a tag. must be within an `html`, but that `html` doesn't need
-to have the tag that's used by `html-tag`.
+creates a tag.
+
+must be within an `html`, but that `html`'s `used-tags` doesn't have
+to contain the `html-tag`'s `tag-name`.
 
 `(html-tag tag-name &optional options &rest body)`
 
@@ -48,11 +47,12 @@ to have the tag that's used by `html-tag`.
 | `body` | implicit progn | the content within the tag | `"text" (div "more text")` |
 | | string | return value | `"<div width=\"10%\" height=\"5%\">text<div>more text</div></div>"` |
 
-### [tag name]
+### `[tag name]`
 
-creates a tag with `html-tag`. must be within an `html` who's
-`used-tags` contains the string "[tag name]". (this works for all
-tags, replacing [tag name] with the actual name of the tag.
+creates a tag with `html-tag`.
+
+must be within an `html` who's `used-tags` contains the string "[tag
+name]". (this works for all tags, replacing [tag name] with the actual name of the tag.
 
 `([tag-name] &optional options &rest body)`
 
@@ -66,14 +66,14 @@ tags, replacing [tag name] with the actual name of the tag.
 
 </details>
 
-<details><summary>`$ll/html/attributes/attributes.lisp` (not done yet)</summary>
+<details><summary><code>$ll/html/attributes/attributes.lisp</code></summary>
 
 ### `attributes`
 
 converts lisp forms to html attributes.
 
-best used directly within or directly above `html`, but can be used
-more specifically as well.
+best used directly within or directly above `html`, but doesn't have
+to be.
 
 `(html-attributes used-attributes forms)`
 
@@ -100,7 +100,7 @@ list.
 | `value` | string | attribute value | `"10%"` |
 | | string | return value | `"width=\"10%\""` |
 
-### [attribute name]
+### `[attribute name]`
 
 creates a tag with `attribute`. must be within an `html-attributes` who's
 `used-attributes` contains the string "[attribute name]". (this works for all
