@@ -1,27 +1,23 @@
-# lispylangs
+# htmlisp
 
-write any language in lisp.
+html as a format isn't very good. however, lisp is nice, especially
+for densely nested things, so why not use it?
 
-because lisp is good.
+this is a lisp tool that converts 'htmlisp' forms to html. (you have
+to write it to a file yourself though)
 
-(currently implemented: html (tags and attributes), current priority: css)
+# `html.lisp`
 
-## terminology
-
-for the rest of this document "$ll" will refer to the lispylangs root
-directory.
-
-<details><summary><h2>html</h2></summary>
-
-<details><summary><code>$ll/html/html.lisp</code></summary>
-
-### `html`
+## `html`
 
 converts lisp forms to html.
 
+creates a scope defining the functions `html-tag` and `[tag name]` (for
+tag names in `used-tags`).
+
 `(html used-tags forms)`
 
-#### arguments
+### arguments
 
 | name | type | description | example |
 | ---- | ---- | ----------- | ------- |
@@ -29,16 +25,17 @@ converts lisp forms to html.
 | `forms` | implicit progn | the content to convert | `(body (div "text"))` |
 | | string | return value | `"<body><div>text</div></body>"` |
 
-### `html-tag`
+## `html-tag`
 
-creates a tag.
+creates an html tag.
 
-must be within an `html`, but that `html`'s `used-tags` doesn't have
-to contain the `html-tag`'s `tag-name`.
+only defined within an `html` block.
+
+`tag-name` doesn't have to be contained within its parent `html`'s `used-tags`.
 
 `(html-tag tag-name &optional options &rest body)`
 
-#### arguments
+### arguments
 
 | name | type | description | example |
 | ---- | ---- | ----------- | ------- |
@@ -47,16 +44,17 @@ to contain the `html-tag`'s `tag-name`.
 | `body` | implicit progn | the content within the tag | `"text" (div "more text")` |
 | | string | return value | `"<div width=\"10%\" height=\"5%\">text<div>more text</div></div>"` |
 
-### `[tag name]`
+## `[tag name]`
 
 creates a tag with `html-tag`.
 
-must be within an `html` who's `used-tags` contains the string "[tag
-name]". (this works for all tags, replacing [tag name] with the actual name of the tag.
+only defined within an `html` block.
+
+`"[tag name]"` must be within its parent `html`'s `used-tags`.
 
 `([tag-name] &optional options &rest body)`
 
-#### arguments
+### arguments
 
 | name | type | description | example |
 | ---- | ---- | ----------- | ------- |
@@ -64,20 +62,27 @@ name]". (this works for all tags, replacing [tag name] with the actual name of t
 | `body` | implicit progn | the content within the tag | `"text" (div "more text")` |
 | | string | return value | `"<div width=\"10%\" height=\"5%\">text<div>more text</div></div>"` |
 
-</details>
+### example
 
-<details><summary><code>$ll/html/attributes/attributes.lisp</code></summary>
+`(div (list "width=\"10%\"") "text")` (assumed to be within `(html
+("div" [...]) ...)`)
 
-### `attributes`
+returns
 
-converts lisp forms to html attributes.
+`"<div width=\"10%\">text</div>"`
 
-best used directly within or directly above `html`, but doesn't have
-to be.
+# `attributes.lisp`
 
-`(html-attributes used-attributes forms)`
+## `attributes`
 
-#### arguments
+creates a scope defining the functions `html-attribute` and `[attribute name]` (for
+attribute names in `used-attributes`).
+
+best used directly within an `html` block.
+
+`(attributes used-attributes forms)`
+
+### arguments
 
 | name | type | description | example |
 | ---- | ---- | ----------- | ------- |
@@ -85,14 +90,16 @@ to be.
 | `forms` | implicit progn | the content containing attribute forms | `(div (list (style "width: 10%")) text)` |
 | | string | return value | `"style=\"width: 10%\""` |
 
-### `html-attribute`
+## `html-attribute`
 
 creates an attribute from either a pair of strings or a 2-element
 list.
 
+only defined within an `attributes` block.
+
 `(html-attribute name &optional value)`
 
-#### arguments
+### arguments
 
 | name | type | description | example |
 | ---- | ---- | ----------- | ------- |
@@ -100,22 +107,19 @@ list.
 | `value` | string | attribute value | `"10%"` |
 | | string | return value | `"width=\"10%\""` |
 
-### `[attribute name]`
+## `[attribute name]`
 
-creates a tag with `attribute`. must be within an `html-attributes` who's
-`used-attributes` contains the string "[attribute name]". (this works for all
-attributes, replacing [attribute name] with the actual name of the attribute.
+creates a attribute with `html-attribute`.
+
+only defined within an `attributes` block.
+
+`"[attribute name]"` must be within its parent `attributes`'s `used-attributes`.
 
 `([attribute name] value)`
 
-#### arguments
+### arguments
 
 | name | type | description | example |
 | ---- | ---- | ----------- | ------- |
 | `value` | string | attribute value | `"10%"` |
 | | string | return value | `"width=\"10%\""` |
-
-</details>
-
-</details>
-
