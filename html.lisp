@@ -1,18 +1,17 @@
 (defmacro html (used-tags &rest body)
-  `(flet ((html-tag (tag &optional ops &rest rest)
-                    (let ((content (cond
-                                    ((typep ops 'list) (first rest))
-                                    (ops (concatenate 'list (list ops) (first rest)))
-                                    (t nil))))
-                      (let ((options (when (typep ops 'list) ops)))
-                        (concatenate 'string "<" tag
-                                     (format nil "~{ ~a~}" options) ">"
-                                     (format nil "~{~a~%~}" content) "</" tag ">")
-                        ))))
-     (flet ,(mapcar (lambda
-                      (tag)
-                      `(,(intern (string-upcase tag))
-                        (&optional ops &rest rest)
-                        (html-tag ,tag ops rest)))
-                    used-tags)
-       ,@body)))
+  `(let ((html-no-closing-tag-list (list "area" "base" "br" "col" "embed" "hr" "img" "input" "link" "meta" "source" "track" "wbr")))
+     (flet ((html-tag (tag &optional ops &rest rest)
+              (let ((content (cond ((typep ops 'list) (first rest))
+                                   (ops (concatenate 'list (list ops) (first rest)))
+                                   (t nil))))
+                (let ((options (when (typep ops 'list) ops)))
+                  (apply #'concatenate 'string
+                         "<" tag (format nil "~{ ~a~}" options)
+                         (if (find (string-downcase tag) html-no-closing-tag-list :test #'equal)
+                             (list " />")
+                             (list ">" (format nil "~{~a~}" content) "</" tag ">")))))))
+       (flet ,(mapcar (lambda (tag)
+                        `(,(intern (string-upcase tag)) (&optional ops &rest rest)
+                           (html-tag ,tag ops rest)))
+                      used-tags)
+         ,@body))))
